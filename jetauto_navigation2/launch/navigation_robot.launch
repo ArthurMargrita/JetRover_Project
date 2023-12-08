@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<launch>
+    <!--paramètres de lancement -->
+    <!-- le dossier contenant les maps se trouvent dans ros_ws/src/map, configurable dans le fichier load_map.launch-->
+    <arg name="map"         default="map_milieu2_1"/> 
+
+
+    <!-- charger la map -->
+    <include file="$(find hiwonder_navigation)/launch/include/load_map.launch">
+        <arg name="map"         value="$(arg map)"/>
+    </include>
+
+
+    <!-- démarrer le paquet de l'algo amcl (renvoie la position du robot par rapport à la map)-->
+    <include file="$(find hiwonder_navigation)/launch/include/amcl.launch">
+        <arg name="drive_type"      value="omni"/> <!-- parametre pour utiliser les roues omnidirectionelles-->
+        <arg name="scan_topic"      value="scan"/> 
+        <arg name="use_map_topic"   value="true"/>
+        <arg name="map_topic"       value="map"/>
+        <arg name="map_frame_id"    value="map"/>
+        <arg name="odom_frame_id"   value="odom"/>
+        <arg name="base_frame_id"   value="base_footprint"/>
+        <arg name="initial_pose_x"  value="0.0"/>
+        <arg name="initial_pose_y"  value="0.0"/>
+        <arg name="initial_pose_a"  value="0.0"/>
+    </include>
+
+    <!-- démarrer le packet move_base -->
+        <include file="$(find hiwonder_navigation)/launch/include/move_base.launch">
+            <arg name="drive_type"                      value="omni"/>
+            <arg name="use_teb"                         value="true"/> <!-- Active l'algorithme TEB pour la planification de trajectoire dynamique, optimisée en temps réel. -->
+            <arg name="cmd_vel_topic"                   value="/cmd_vel"/>
+
+            <arg name="global_costmap_map_topic"        value="map"/>
+            <arg name="global_costmap_sensor_frame"     value="base_footprint"/>
+            <arg name="global_costmap_sensor_topic"     value="scan"/>
+            <arg name="global_costmap_global_frame"     value="map"/>
+            <arg name="global_costmap_robot_base_frame" value="base_footprint"/>
+            <arg name="local_costmap_map_topic"         value="map"/>
+            <arg name="local_costmap_sensor_frame"      value="base_footprint"/>
+            <arg name="local_costmap_sensor_topic"      value="scan"/>
+            <arg name="local_costmap_global_frame"      value="odom"/>
+            <arg name="local_costmap_robot_base_frame"  value="base_footprint"/>
+            <arg name="virtual_wall_map_frame"          value="map"/>
+            <arg name="dwa_global_frame"                value="map"/>
+            <arg name="teb_odom_topic"                  value="odom"/>
+            <arg name="teb_map_frame"                   value="odom"/>
+        </include> 
+
+    <!--
+    <include file="$(find hiwonder_slam)/launch/include/hiwonder_robot.launch">
+        <arg name="sim"         value="$(arg sim)"/>
+        <arg name="app"         value="$(arg app)"/>
+        <arg name="use_joy"     value="false"/>
+        <arg name="robot_name"  value="$(arg robot_name)"/>
+        <arg name="master_name" value="$(arg master_name)"/>
+    </include>
+    -->
+
+</launch>

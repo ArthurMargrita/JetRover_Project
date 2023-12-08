@@ -1,0 +1,17 @@
+TrajectoryPlannerROS:
+  max_vel_x: 0.15
+  min_vel_x: 0.05
+  max_vel_theta: 0.5
+  min_vel_theta: 0.1
+  acc_lim_x: 1.0
+  acc_lim_theta: 1.0
+
+global_frame: "map"  # AMCL publie la position du robot dans "map"
+robot_base_frame: "base_link"
+update_frequency: 5.0  # Mise à jour du planner global (augmente si latence)
+publish_frequency: 2.0  # Fréquence de publication du plan global
+static_map: true  # On utilise une carte statique fournie par AMCL
+transform_tolerance: 1  # Augmente la tolérance aux latences TF
+
+
+

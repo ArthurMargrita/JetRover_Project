@@ -1,0 +1,11 @@
+<launch>
+    <!-- Charger la carte -->
+    <node name="map_server" pkg="map_server" type="map_server" args="/home/ubuntu/ros_ws/src/map/map_milieu2.yaml"/>
+
+    <!-- Lancer AMCL -->
+    <node name="amcl" pkg="amcl" type="amcl" output="screen">
+        <param name="use_map_topic" value="true"/>
+    </node>
+
+</launch>
+

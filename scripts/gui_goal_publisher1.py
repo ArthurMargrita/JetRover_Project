@@ -7,8 +7,6 @@ from move_base_msgs.msg import MoveBaseActionGoal
 from actionlib_msgs.msg import GoalID
 from geometry_msgs.msg import PoseWithCovarianceStamped, Quaternion
 from std_srvs.srv import Empty
-from geometry_msgs.msg import PoseStamped
-
 
 import math
 from PyQt5.QtWidgets import (
@@ -23,11 +21,10 @@ from PyQt5.QtWidgets import (
     QFormLayout,
 )
 
-def euler_to_quaternion(yaw_degrees):
+def euler_to_quaternion(yaw):
     """
     Convertit une rotation autour de l'axe Z (yaw) en quaternion.
     """
-    yaw = math.radians(yaw_degrees)
     qx = 0.0
     qy = 0.0
     qz = math.sin(yaw / 2.0)
@@ -47,7 +44,7 @@ class GoalPublisherApp(QMainWindow):
 
         # Configuration de l'interface utilisateur
         self.setWindowTitle("Goal Publisher")
-        self.setGeometry(100, 100, 400, 350)
+        self.setGeometry(100, 100, 400, 300)
 
         # Layout principal
         main_layout = QVBoxLayout()
@@ -61,13 +58,9 @@ class GoalPublisherApp(QMainWindow):
 
         form_layout.addRow(QLabel("Position X :"), self.x_input)
         form_layout.addRow(QLabel("Position Y :"), self.y_input)
-        form_layout.addRow(QLabel("Rotation (Yaw, en degré) :"), self.yaw_input)
+        form_layout.addRow(QLabel("Rotation (Yaw, en radians) :"), self.yaw_input)
 
         main_layout.addLayout(form_layout)
-
-        # Label pour afficher la position actuelle du robot
-        self.robot_position_label = QLabel("Position actuelle : Inconnue")
-        main_layout.addWidget(self.robot_position_label)
 
         # Boutons
         button_layout = QHBoxLayout()
@@ -81,13 +74,9 @@ class GoalPublisherApp(QMainWindow):
         self.reset_button = QPushButton("Réinitialiser AMCL")  # Bouton pour reset AMCL
         self.reset_button.clicked.connect(self.reset_amcl)
 
-        self.check_position_button = QPushButton("Check Position")  # Nouveau bouton
-        self.check_position_button.clicked.connect(self.check_position)  # Connexion du bouton
-
         button_layout.addWidget(self.publish_button)
         button_layout.addWidget(self.stop_button)
         button_layout.addWidget(self.reset_button)
-        button_layout.addWidget(self.check_position_button)  # Ajouter le bouton à l'interface
 
         main_layout.addLayout(button_layout)
 
@@ -100,6 +89,9 @@ class GoalPublisherApp(QMainWindow):
         self.goal_position = None
         self.robot_position = None
 
+        # Démarrer un timer pour la vérification périodique
+        rospy.Timer(rospy.Duration(1), self.check_positions)
+
     def publish_goal(self):
         """
         Publie un message MoveBaseActionGoal sur le topic /move_base/goal.
@@ -110,15 +102,20 @@ class GoalPublisherApp(QMainWindow):
             z = 0
             yaw = float(self.yaw_input.text())
 
-            goal_msg = PoseStamped()
+            goal_msg = MoveBaseActionGoal()
             goal_msg.header.frame_id = "map"
             goal_msg.header.stamp = rospy.Time.now()
-            goal_msg.pose.position.x = x
-            goal_msg.pose.position.y = y
-            goal_msg.pose.orientation = euler_to_quaternion(yaw)
+            goal_msg.goal_id.stamp = rospy.Time.now()
+            goal_msg.goal_id.id = "goal_gui"
+
+            goal_msg.goal.target_pose.header.frame_id = "map"
+            goal_msg.goal.target_pose.header.stamp = rospy.Time.now()
+            goal_msg.goal.target_pose.pose.position.x = x
+            goal_msg.goal.target_pose.pose.position.y = y
+            goal_msg.goal.target_pose.pose.position.z = z
+            goal_msg.goal.target_pose.pose.orientation = euler_to_quaternion(yaw)
 
             rospy.loginfo("Envoi du goal : %s", goal_msg)
-            rospy.loginfo(goal_msg)
             self.publisher.publish(goal_msg)
 
             self.goal_position = (x, y)
@@ -128,6 +125,16 @@ class GoalPublisherApp(QMainWindow):
 
     def pose_callback(self, msg):
         self.robot_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
+
+    def check_positions(self, event):
+        if self.goal_position and self.robot_position:
+            goal_x, goal_y = self.goal_position
+            robot_x, robot_y = self.robot_position
+            distance = math.sqrt((goal_x - robot_x) ** 2 + (goal_y - robot_y) ** 2)
+            rospy.loginfo("Distance entre le robot et le goal : %.2f", distance)
+            if distance <= 0.2:
+                rospy.loginfo("Le robot a atteint la position cible !")
+                self.goal_position = None
 
     def stop(self):
         rospy.loginfo("Annulation du goal en cours...")
@@ -148,25 +155,8 @@ class GoalPublisherApp(QMainWindow):
             reset_service = rospy.ServiceProxy("/global_localization", Empty)
             reset_service()
             rospy.loginfo("AMCL réinitialisé avec succès.")
-
-            # Mise à jour de l'affichage avec la position actuelle du robot
-            if self.robot_position:
-                self.robot_position_label.setText("Position actuelle : X={:.2f}, Y={:.2f}".format(self.robot_position[0], self.robot_position[1]))
-
-            else:
-                self.robot_position_label.setText("Position actuelle : Inconnue")
-
         except rospy.ServiceException as e:
             rospy.logerr("Erreur lors de l'appel au service: %s", e)
-
-    def check_position(self):
-        """
-        Affiche la position actuelle du robot avec AMCL.
-        """
-        if self.robot_position:
-            self.robot_position_label.setText("Position actuelle : X={:.2f}, Y={:.2f}".format(self.robot_position[0], self.robot_position[1]))
-        else:
-            self.robot_position_label.setText("Position actuelle : Inconnue")
 
 if __name__ == "__main__":
     try:

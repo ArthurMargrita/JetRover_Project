@@ -1,0 +1,50 @@
+shutdown_costmaps: false  # Fermer la costmap lorsque move_base cesse de bouger
+
+base_global_planner: "global_planner/GlobalPlanner"  # Nom du planificateur global utilisé dans move_base
+#base_global_planner: "navfn/NavfnROS"
+#base_local_planner: "teb_local_planner/TebLocalPlannerROS"
+base_local_planner: "dwa_local_planner/DWAPlannerROS"  # Nom du planificateur local utilisé dans move_base
+
+controller_frequency: 10.0  # Fréquence d'envoi des commandes de mouvement au topic cmd_vel (Hz)
+controller_patience: 20.0  # Temps avant échec si le contrôleur ne reçoit pas de commande
+
+planner_frequency: 5.0  # Fréquence d'exécution du planificateur global. Si 0.0, il ne planifiera à nouveau qu'en cas de nouvel objectif ou de blocage
+planner_patience: 10.0  # Temps maximal autorisé pour la planification globale avant échec
+
+oscillation_timeout: 15.0  # Temps en secondes avant exécution des comportements de récupération en cas d'oscillation
+oscillation_distance: 0.03  # Distance minimale que le robot doit parcourir pour être considéré comme ne oscillant plus
+
+max_planning_retries: 1  # Nombre de tentatives de planification avant d'exécuter un comportement de récupération (-1 pour illimité)
+
+recovery_behavior_enabled: true  # Activer les comportements de récupération de move_base
+clearing_rotation_allowed: true  # Autoriser une rotation sur place pour dégager l'espace (uniquement avec les comportements de récupération par défaut)
+
+recovery_behaviors:
+  - name: 'conservative_reset'
+    type: 'clear_costmap_recovery/ClearCostmapRecovery'
+  #- name: 'aggressive_reset'
+  #  type: 'clear_costmap_recovery/ClearCostmapRecovery'
+  #- name: 'super_reset'
+  #  type: 'clear_costmap_recovery/ClearCostmapRecovery'
+  - name: 'clearing_rotation'
+    type: 'rotate_recovery/RotateRecovery'
+  #- name: 'move_slow_and_clear'
+    #type: 'move_slow_and_clear/MoveSlowAndClear'
+
+conservative_reset:
+  reset_distance: 2.0  # Distance à partir de laquelle les obstacles sont supprimés de la costmap pour libérer l'espace
+  layer_names: [obstacle_layer]
+
+aggressive_reset:
+  reset_distance: 3.0
+  layer_names: [obstacle_layer]
+
+super_reset:
+  reset_distance: 5.0
+  layer_names: [obstacle_layer]
+
+move_slow_and_clear:
+  clearing_distance: 0.5  # Distance à partir du robot où les obstacles seront supprimés (m)
+  limited_trans_speed: 0.1  # Vitesse de translation limitée lors de ce comportement (m/s)
+  limited_rot_speed: 0.4  # Vitesse de rotation limitée lors de ce comportement (rad/s)
+  limited_distance: 0.3  # Distance minimale à parcourir avant de lever la restriction de vitesse (m)

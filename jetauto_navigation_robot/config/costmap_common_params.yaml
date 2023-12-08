@@ -1,0 +1,23 @@
+footprint: "[[0.0, -0.13], [0.0, 0.13], [0.17, 0.13], [0.17, -0.13]]"
+
+obstacle_layer:
+  enabled: true
+  combination_method: 1  # Peut être défini uniquement sur 0 ou 1
+  track_unknown_space: true  # Si false : seulement deux types de coût (collision fatale et zone libre). Si true : trois types (collision fatale, zone libre et zone inconnue)
+  obstacle_range: 3.0  # Met à jour les informations des obstacles situés dans un rayon de cette valeur autour du robot
+  raytrace_range: 3.5  # Met à jour l’espace libre dans un rayon de cette valeur autour du robot
+  observation_sources: scan_filtered
+  scan_filtered: {
+    sensor_frame: base_footprint,
+    observation_persistence: 0.0,  # Durée de conservation des relevés du capteur (en secondes). Si 0, seule la dernière donnée est conservée
+    max_obstacle_height: 0.6,  # Hauteur maximale prise en compte pour les obstacles (mètres)
+    min_obstacle_height: 0.0,  # Hauteur minimale prise en compte pour les obstacles (mètres)
+    data_type: LaserScan,
+    topic: /scan,
+    marking: true,  # Le capteur ajoute les obstacles à la costmap
+    clearing: true  # Le capteur supprime les obstacles de la costmap
+  }
+
+static_layer:
+  enabled: true
+  map_topic: "/map"

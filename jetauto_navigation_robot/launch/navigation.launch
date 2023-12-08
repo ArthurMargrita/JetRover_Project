@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- Charger la carte -->
+	<node name="map_server" pkg="map_server" type="map_server" args="/home/ubuntu/ros_ws/src/map/map_milieu2.yaml"/>
+
+	<!-- Lancer AMCL--> 
+	<node name="amcl" pkg="amcl" type="amcl" output="screen">
+		<remap from="/scan" to="/scan"/>
+	</node>
+
+    	<node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
+
+	    <rosparam file="$(find jetauto_navigation_robot)/config/costmap_common_params.yaml"   command="load" ns="global_costmap"/>
+	    <rosparam file="$(find jetauto_navigation_robot)/config/costmap_common_params.yaml"   command="load" ns="local_costmap"/>
+	    <rosparam file="$(find jetauto_navigation_robot)/config/local_costmap_params.yaml"    command="load"/>
+	    <rosparam file="$(find jetauto_navigation_robot)/config/global_costmap_params.yaml"   command="load"/>
+	    <rosparam file="$(find jetauto_navigation_robot)/config/move_base_params.yaml"  command="load"/>
+	    <rosparam file="$(find jetauto_navigation_robot)/config/base_global_planner_param.yaml"  command="load"/>
+	    <rosparam file="$(find jetauto_navigation_robot)/config/dwa_local_planner_params.yaml" command="load"/>
+
+	    <!-- Set tf_prefix for frames explicitly, overwriting defaults -->
+	    <param name="global_costmap/obstacle_layer/scan_filtered/topic"         value="scan"/>
+	    <param name="global_costmap/obstacle_layer/scan_filtered/sensor_frame"  value="base_footprint"/>
+	    <param name="global_costmap/global_frame"                               value="map"/>
+	    <param name="global_costmap/robot_base_frame"                           value="base_footprint"/>
+	    <param name="global_costmap/static_layer/map_topic"                     value="map"/>
+
+	    <param name="local_costmap/obstacle_layer/scan_filtered/topic"          value="scan"/>
+	    <param name="local_costmap/obstacle_layer/scan_filtered/sensor_frame"   value="base_footprint"/>
+	    <param name="local_costmap/global_frame"                                value="odom"/>
+	    <param name="local_costmap/robot_base_frame"                            value="base_footprint"/>
+	    <param name="local_costmap/static_layer/map_topic"                      value="map"/>
+
+	    <param name="local_costmap/virtual_wall/map_frame"                      value="map"/>
+
+	    <param name="base_local_planner"            value="dwa_local_planner/DWAPlannerROS"/>
+	    <param name="DWAPlannerROS/global_frame_id" value="map"/>
+
+	    <remap from="cmd_vel" to="/cmd_vel"/>
+	</node>
+
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find jetauto_navigation_robot)/rviz/navigation.rviz"/>
+
+    	<node pkg="jetauto_navigation_robot" type="gui_cmdvel_control3.py" name="gui_cmdvel_control3" output="screen" args="$(find jetauto_navigation_robot)/scripts/gui_cmdvel_control3.py" />
+
+	<node pkg="jetauto_navigation_robot" type="gui_goal_publisher.py" name="gui_goal_publisher" output="screen" args="$(find jetauto_navigation_robot)/scripts/gui_goal_publisher.py" />
+
+
+
+
+
+</launch>

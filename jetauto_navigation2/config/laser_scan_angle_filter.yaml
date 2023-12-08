@@ -1,0 +1,8 @@
+laser_scan_angle_filter:
+  type: "laser_filters/LaserScanAngleFilter"
+  params:
+    angle_min: -0.1745   # -90° en radians
+    angle_max: 0.1745    # 90° en radians
+  input_scan: /scan
+  output_scan: /scan_filtered
+

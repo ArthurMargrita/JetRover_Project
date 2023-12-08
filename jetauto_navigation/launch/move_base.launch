@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- Charger la carte -->
+	<node name="map_server" pkg="map_server" type="map_server" args="/home/ubuntu/ros_ws/src/map/map_milieu2.yaml"/>
+
+	<!-- Lancer AMCL -->
+	<node name="amcl" pkg="amcl" type="amcl" output="screen">
+		<param name="use_map_topic" value="true"/>
+		<remap from="/scan" to="/scan"/>
+
+	</node>
+
+    <!-- démarrer le packet move_base -->
+	<node pkg="move_base" type="move_base" name="move_base" output="screen">
+		<rosparam file="$(find jetauto_navigation)/config/move_base_params.yaml" command="load"/>
+        	<rosparam file="$(find jetauto_navigation)/config/global_costmap_params.yaml" command="load"/>
+        	<rosparam file="$(find jetauto_navigation)/config/local_costmap_params.yaml" command="load"/>
+		<remap from="/scan" to="/scan"/>
+
+	</node>
+
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find jetauto_navigation)/rviz/navigation.rviz"/>
+	
+    	<node name="gui_goal_publisher" output="screen" command="python /home/ubuntu/ros_ws/src/scripts/gui_goal_publisher.py"/>
+
+	<node name="gui_cmdvel_publisher" output="screen" command="python /home/ubuntu/ros_ws/src/scripts/gui_cmdvel_control3.py"/>
+
+
+</launch>

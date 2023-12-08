@@ -1,0 +1,42 @@
+DWAPlannerROS:
+  # Paramètres de configuration du robot
+  max_vel_x: 0.1  # Vitesse linéaire maximale en x (m/s)
+  min_vel_x: -0.1 # Vitesse linéaire minimale en x (m/s), négatif signifie marche arrière
+  max_vel_y: 0.0   # Vitesse linéaire maximale en y (m/s), 0 pour un robot à entraînement différentiel
+  min_vel_y: 0.0   # Vitesse linéaire minimale en y (m/s), 0 pour un robot à entraînement différentiel
+  max_vel_trans: 0.1      # Vitesse de translation maximale (m/s)
+  min_vel_trans: 0.05     # Vitesse de translation minimale (m/s), ne peut pas être zéro
+  max_vel_theta: 0.5       # Vitesse angulaire maximale (rad/s)
+  min_vel_theta: 0.1       # Vitesse angulaire minimale (rad/s)
+  acc_lim_x: 2.5           # Accélération maximale en x (m/s²)
+  acc_lim_theta: 3         # Accélération angulaire maximale (rad/s²)
+  acc_lim_y: 0.0           # Accélération maximale en y, 0 pour un robot à entraînement différentiel
+
+  # Paramètres de tolérance des objectifs
+  yaw_goal_tolerance: 0.05 # Tolérance angulaire à l'arrivée à la cible (radian)
+  xy_goal_tolerance: 0.17   # Tolérance de distance en x et y à l'arrivée à la cible (m)
+  # latch_xy_goal_tolerance: false # Si activé, le robot tourne sur place en restant dans la tolérance
+
+  # Paramètres de simulation en avant
+  sim_time: 1.8       # Durée de la simulation en avant (s)
+  vx_samples: 10      # Nombre d'échantillons de vitesse en x
+  vy_samples: 0       # Nombre d'échantillons de vitesse en y (0 pour un robot à entraînement différentiel)
+  vtheta_samples: 20  # Nombre d'échantillons de vitesse en rotation
+
+  # Paramètres d'évaluation de la trajectoire
+  path_distance_bias: 32.0      # Pondération de la proximité à la trajectoire prévue
+  goal_distance_bias: 20.0      # Pondération de la proximité au point cible local, utilisé pour le contrôle de vitesse
+  occdist_scale: 0.01           # Importance de l'évitement des obstacles
+  forward_point_distance: 0.325 # Distance d'un point de référence supplémentaire pour le calcul de trajectoire
+  stop_time_buffer: 0.2         # Temps minimum avant une collision pour que la trajectoire reste valide
+  scaling_speed: 0.25           # Vitesse à partir de laquelle l'empreinte du robot commence à être réduite (m/s)
+  max_scaling_factor: 0.2       # Facteur de réduction maximal de l'empreinte du robot
+
+  # Paramètres pour éviter les oscillations
+  oscillation_reset_dist: 0.05  # Distance minimale à parcourir pour réinitialiser l'état d'oscillation
+  # oscillation_reset_angle: 0.05
+
+  # Paramètres de débogage
+  publish_traj_pc: true        # Afficher la trajectoire planifiée dans RVIZ
+  publish_cost_grid_pc: true   # Afficher les coûts dans RVIZ
+  global_frame_id: map         # Cadre de référence global

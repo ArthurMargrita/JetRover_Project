@@ -1,0 +1,24 @@
+# 局部代价图(local cost map)
+local_costmap:
+  global_frame: odom                 # Global frame utilisé pour la costmap.
+  robot_base_frame: base_footprint   # Frame de base du robot.
+  update_frequency: 10.0             # Fréquence de mise à jour (Hz).
+  publish_frequency: 10.0            # Fréquence de publication (Hz).
+  rolling_window: true               # Utilise une fenêtre roulante.
+  width: 3.0                         # Largeur de la costmap (m).
+  height: 3.0                        # Hauteur de la costmap (m).
+  resolution: 0.025                  # Résolution de la costmap (m/cellule).
+  transform_tolerance: 1             # Tolérance pour les transformations (s).
+  # Définition du footprint du robot.
+  # Ici, le polygon est défini de sorte qu'il ne s'étende pas en arrière (aucune valeur négative en x),
+  plugins:
+    - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    
+  inflation_layer:
+    enabled: true
+    inflation_radius: 0.3  # Doit être inférieur ou égal au robot_radius.
+    cost_scaling_factor: 1.0
+  virtual_wall:
+    map_frame: "map"
+
