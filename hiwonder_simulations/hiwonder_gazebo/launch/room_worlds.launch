@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Arguments pour configurer Gazebo -->
+    <arg name="paused"              default="false"/>
+    <arg name="use_sim_time"        default="true"/>
+    <arg name="gui"                 default="true"/>
+    <arg name="headless"            default="false"/>
+    <arg name="debug"               default="false"/>
+    <arg name="world_name"          default="$(find hiwonder_gazebo)/worlds/robocup_home.world"/> <!-- Monde de départ -->
+
+    <!-- Activer l'usage de l'horloge simulée -->
+    <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+
+    <!-- Démarrage du serveur Gazebo -->
+    <node name="gazebo" pkg="gazebo_ros" type="gzserver" output="screen"
+          args="-s libgazebo_ros_factory.so $(arg world_name)"/>
+
+    <!-- Démarrage du client Gazebo -->
+    <group if="$(arg gui)">
+        <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" output="screen"/>
+    </group>
+
+    <!-- Ajouter les modèles -->
+    <arg name="model_path" default="$(find hiwonder_gazebo)/models"/>
+    <node name="bed"        pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/bed.model -x 5.0 -y -3.9 -z 0 -Y 3.14159 -urdf -model bed" />
+    <node name="sofa"       pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/sofa.model -x -1.0 -y -3.9 -z 0 -Y 1.57 -urdf -model sofa" />
+    <node name="tea_table"  pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/tea_table.model -x -2.1 -y -2.2 -z 0 -Y 1.57 -urdf -model tea_table" />
+    <node name="bookshelft" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/bookshelft.model -x 2.0 -y -0.55 -z 0 -Y -1.57 -urdf -model bookshelft" />
+    <node name="kitchen_table"   pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/table.model -x -3.5 -y 3.7 -z 0 -Y 1.57 -urdf -model kitchen_table" />
+    <node name="dinning_table_0" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/table.model -x 1.5 -y 1.5 -z 0 -Y 1.57 -urdf -model dinning_table_0" />
+    <node name="dinning_table_1" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/table.model -x 1.5 -y 2.0 -z 0 -Y 1.57 -urdf -model dinning_table_1" />
+    <node name="dinning_table_2" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/table.model -x 2.7 -y 1.5 -z 0 -Y 1.57 -urdf -model dinning_table_2" />
+    <node name="dinning_table_3" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/table.model -x 2.7 -y 2.0 -z 0 -Y 1.57 -urdf -model dinning_table_3" />
+    <node name="chair_0" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/chair.model -x 1.5 -y 1.2 -z 0 -Y 1.57 -urdf -model chair_0" />
+    <node name="chair_1" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/chair.model -x 1.5 -y 2.3 -z 0 -Y -1.57 -urdf -model chair_1" />
+    <node name="chair_2" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/chair.model -x 2.7 -y 1.2 -z 0 -Y 1.57 -urdf -model chair_2" />
+    <node name="chair_3" pkg="gazebo_ros" type="spawn_model" args="-file $(arg model_path)/chair.model -x 2.7 -y 2.3 -z 0 -Y -1.57 -urdf -model chair_3" />
+</launch>
+

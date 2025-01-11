@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+  <!-- Argument pour spécifier le fichier YAML des contrôleurs -->
+  <arg name="config_file" default="$(find hiwonder_moveit_config)/config/ros_controllers_jetauto.yaml"/>
+
+  <!-- Charger les configurations de contrôleurs dans le serveur de paramètres -->
+  <rosparam file="$(arg config_file)" command="load"/>
+
+  <!-- Lancer le manager de contrôleurs -->
+    <!-- 
+  <node name="controller_manager" pkg="controller_manager" type="controller_manager" output="screen"/>
+-->
+  <!-- Lancer le spawner pour les contrôleurs -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        output="screen" args="joint_state_controller arm_controller gripper_controller"/>
+</launch>
+

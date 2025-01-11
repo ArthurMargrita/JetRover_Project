@@ -1,0 +1,19 @@
+<launch>
+    <!-- Charger le modèle du gripper dans le paramètre robot_description -->
+    <param name="robot_description" command="$(find xacro)/xacro $(find hiwonder_description)/urdf/gripper.urdf.xacro" />
+
+    <!-- Publier l'état du robot -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+    <!-- Lancer Gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+    </include>
+
+    <!-- Spawner URDF du gripper -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model gripper" output="screen"/>
+
+    <!-- Contrôleurs du gripper -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" args="gripper_controller joint_state_controller" output="screen"/>
+</launch>

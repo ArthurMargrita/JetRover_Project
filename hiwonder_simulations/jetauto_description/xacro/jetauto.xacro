@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="jetauto" xmlns:xacro="http://ros.org/wiki/xacro">
+
+<xacro:arg name="odom_frame" default="odom"/>
+<xacro:arg name="base_frame" default="base_footprint"/>
+<xacro:arg name="depth_camera_name" default="camera"/>
+<xacro:arg name="lidar_view" default="false" />
+
+    <xacro:include filename="$(find jetauto_description)/xacro/urdf/jetauto.urdf.xacro"/>
+    <xacro:include filename="$(find jetauto_description)/xacro/gazebo/jetauto.gazebo.xacro"/>
+    
+</robot>

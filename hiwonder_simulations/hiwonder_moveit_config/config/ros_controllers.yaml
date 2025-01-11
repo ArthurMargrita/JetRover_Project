@@ -1,0 +1,69 @@
+moveit_sim_hw_interface:
+  joint_model_group: arm
+  joint_model_group_pose: home
+
+generic_hw_control_loop:
+  loop_hz: 100
+  cycle_time_error_threshold: 0.01
+
+hardware_interface:
+  joints:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - r_joint
+  sim_control_mode: 0  # Mode position
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+arm_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+  constraints:
+    goal_time: 2
+    stopped_velocity_tolerance: 0.01
+    joints:
+      joint1: {trajectory: 0.1, goal: 0.05}
+      joint2: {trajectory: 0.1, goal: 0.05}
+      joint3: {trajectory: 0.1, goal: 0.05}
+      joint4: {trajectory: 0.1, goal: 0.05}
+  state_publish_rate: 25
+
+gripper_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - r_joint
+  state_publish_rate: 25
+
+controller_list:
+  - name: arm_controller
+    action_ns: follow_joint_trajectory
+    default: True
+    type: FollowJointTrajectory
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+  - name: gripper_controller
+    action_ns: follow_joint_trajectory
+    default: False
+    type: FollowJointTrajectory
+    joints:
+      - r_joint
+
+gazebo_ros_control:
+  pid_gains:
+    joint1: {p: 2.0, i: 0.05, d: 0.1}
+    joint2: {p: 2.0, i: 0.05, d: 0.1}
+    joint3: {p: 2.0, i: 0.05, d: 0.1}
+    joint4: {p: 2.0, i: 0.05, d: 0.1}
+    r_joint: {p: 0.5, i: 0.01, d: 0.1}
+
