@@ -1,0 +1,8 @@
+lancer le noeud qui va publier la carte:
+
+rosrun map_server map_server carte_1.yaml
+
+après on peut la visualiser dans rviz
+
+convertir pgm / png:
+convert map.png map.pgm (avec le logiciel imagemagik)

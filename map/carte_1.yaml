@@ -1,0 +1,6 @@
+image: carte_1.pgm  # Nom de l'image PGM
+resolution: 0.05   # Taille d'un pixel en mètres (ajuste selon tes besoins)
+origin: [0.0, 0.0, 0.0]  # Coordonnées de l'origine (x, y, orientation)
+negate: 0          # Indique que les pixels noirs représentent les obstacles
+occupied_thresh: 0.65  # Seuil pour considérer un pixel comme occupé
+free_thresh: 0.196     # Seuil pour considérer un pixel comme libre

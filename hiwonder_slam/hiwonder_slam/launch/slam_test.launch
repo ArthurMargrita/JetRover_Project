@@ -1,0 +1,25 @@
+<launch>
+    <!-- Lancer le noeud slam_gmapping -->
+    <node pkg="gmapping" type="slam_gmapping" name="gmapping" output="screen">
+    <include file="$(find hiwonder_slam)/launch/include/slam_base.launch">
+        <!-- Paramètres de configuration -->
+        <param name="maxUrange" value="10.0"/> <!-- Portée maximale utilisée -->
+        <param name="maxRange" value="12.0"/> <!-- Portée maximale du lidar -->
+        <param name="delta" value="0.05"/> <!-- Résolution (pixels/cellules) -->
+        <param name="linearUpdate" value="0.5"/> <!-- Distance avant une mise à jour -->
+        <param name="angularUpdate" value="0.2"/> <!-- Angle avant mise à jour -->
+        <param name="particles" value="80"/> <!-- Nombre de particules -->
+        <param name="xmin" value="-10.0"/> <!-- Limites de la carte -->
+        <param name="ymin" value="-10.0"/>
+        <param name="xmax" value="10.0"/>
+        <param name="ymax" value="10.0"/>
+        <param name="map_update_interval" value="5.0"/> <!-- Fréquence des updates -->
+        
+        <!-- Remappage des topics -->
+        <remap from="scan" to="/scan_raw"/> <!-- Topic des données Lidar -->
+        <remap from="tf" to="/tf"/> <!-- Transformations -->
+        <remap from="odom" to="/odom"/> <!-- Odométrie -->
+    </include>
+
+</launch>
+

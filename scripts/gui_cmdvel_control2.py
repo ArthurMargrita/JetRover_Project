@@ -4,7 +4,7 @@
 import rospy
 from geometry_msgs.msg import Twist
 from PyQt4.QtGui import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QSlider, QLabel
-from PyQt4.QtCore import Qt, QTimer
+from PyQt4.QtCore import Qt
 
 class RobotController(QWidget):
     def __init__(self):
@@ -12,64 +12,44 @@ class RobotController(QWidget):
         self.init_ros()
         self.init_ui()
 
-        self.speed = 0.5  # Vitesse par défaut
-        self.current_speed = 0.0  # Vitesse actuelle (pour les transitions douces)
-        self.acceleration_step = 0.05  # Pas d'accélération
-        self.update_rate = 50  # Intervalle du timer (en ms)
-
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_velocity)
-
-        self.target_linear_x = 0.0
-        self.target_linear_y = 0.0
-        self.target_angular_z = 0.0
+        # Vitesse initiale
+        self.speed_x = 0.3
+        self.speed_y = 0.2
+        self.speed_ang = 0.5
 
     def init_ros(self):
         """Initialise le nœud ROS et le publisher."""
-        rospy.init_node("robot_controller_direction_keyboard", anonymous=True)
+        rospy.init_node("robot_controller_direction_gui", anonymous=True)
         self.pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
 
-    def send_velocity(self):
+    def send_velocity(self, linear_x=0.0, linear_y=0.0, angular_z=0.0):
         """Publie un message Twist sur le topic /cmd_vel."""
         twist = Twist()
-        twist.linear.x = self.current_speed * self.target_linear_x
-        twist.linear.y = self.current_speed * self.target_linear_y
-        twist.angular.z = self.current_speed * self.target_angular_z
+        twist.linear.x = linear_x * self.speed_x
+        twist.linear.y = linear_y * self.speed_y
+        twist.angular.z = angular_z * self.speed_ang
         self.pub.publish(twist)
 
-    def update_speed(self, value):
+    def update_speed_x(self, value):
         """Met à jour la vitesse selon la position du slider."""
-        self.speed = value / 100.0  # Convertir la valeur du slider (0-100) en 0.0-1.0
-        self.speed_label.setText("Vitesse : {:.2f}".format(self.speed))
+        self.speed_x = value / 100.0  # Convertir la valeur du slider (0-100) en 0.0-1.0
+        self.speed_x_label.setText("Vitesse X: {:.2f}".format(self.speed_x))
+        
+    def update_speed_y(self, value):
+        """Met à jour la vitesse selon la position du slider."""
+        self.speed_y = value / 100.0  # Convertir la valeur du slider (0-100) en 0.0-1.0
+        self.speed_y_label.setText("Vitesse Y: {:.2f}".format(self.speed_y))
+        
+    def update_speed_ang(self, value):
+        """Met à jour la vitesse selon la position du slider."""
+        self.speed_ang = value / 100.0  # Convertir la valeur du slider (0-100) en 0.0-1.0
+        self.speed_ang_label.setText("Vitesse ang: {:.2f}".format(self.speed_ang))
+        	
 
-    def update_velocity(self):
-        """Met à jour progressivement la vitesse actuelle jusqu'à la vitesse cible."""
-        if self.current_speed < self.speed:
-            self.current_speed = min(self.current_speed + self.acceleration_step, self.speed)
-        elif self.current_speed > self.speed:
-            self.current_speed = max(self.current_speed - self.acceleration_step, 0.0)
-
-        self.send_velocity()
-
-    def start_movement(self, linear_x, linear_y, angular_z):
-        """Démarre un mouvement progressif vers une direction cible."""
-        self.target_linear_x = linear_x
-        self.target_linear_y = linear_y
-        self.target_angular_z = angular_z
-        self.timer.start(self.update_rate)
-
-    def stop_movement(self):
-        """Arrête le mouvement."""
-        self.target_linear_x = 0.0
-        self.target_linear_y = 0.0
-        self.target_angular_z = 0.0
-        self.timer.stop()
-        self.current_speed = 0.0
-        self.send_velocity()
 
     def init_ui(self):
         """Initialise l'interface graphique."""
-        self.setWindowTitle("Contrôleur de Robot")
+        self.setWindowTitle("Control Jetauto Pro")
         self.setGeometry(100, 100, 400, 400)
 
         # Layouts
@@ -79,31 +59,61 @@ class RobotController(QWidget):
         slider_layout = QVBoxLayout()
 
         # Boutons de contrôle linéaire
-        btn_forward = QPushButton("Avancer")
-        btn_backward = QPushButton("Reculer")
-        btn_left = QPushButton("Gauche")
-        btn_right = QPushButton("Droite")
-        btn_stop = QPushButton("Arrêter")
+        btn_forward = QPushButton("forward")
+        btn_backward = QPushButton("backward")
+        btn_left = QPushButton("left")
+        btn_right = QPushButton("right")
+        btn_stop = QPushButton("STOP")
+
+        # Boutons de contrôle angulaire
+        btn_rotate_left = QPushButton("turn left")
+        btn_rotate_right = QPushButton("turn right")
 
         # Slider pour la vitesse
-        self.speed_slider = QSlider(Qt.Horizontal)
-        self.speed_slider.setMinimum(0)
-        self.speed_slider.setMaximum(100)
-        self.speed_slider.setValue(50)  # Valeur initiale (0.5)
-        self.speed_slider.setTickInterval(10)
-        self.speed_slider.setTickPosition(QSlider.TicksBelow)
-        self.speed_slider.valueChanged.connect(self.update_speed)
+        self.speed_x_slider = QSlider(Qt.Horizontal)
+        self.speed_x_slider.setMinimum(0)
+        self.speed_x_slider.setMaximum(100)
+        self.speed_x_slider.setValue(30)  # Valeur initiale (0.5)
+        self.speed_x_slider.setTickInterval(10)
+        self.speed_x_slider.setTickPosition(QSlider.TicksBelow)
+        self.speed_x_slider.valueChanged.connect(self.update_speed_x)
+        
+        self.speed_y_slider = QSlider(Qt.Horizontal)
+        self.speed_y_slider.setMinimum(0)
+        self.speed_y_slider.setMaximum(100)
+        self.speed_y_slider.setValue(20)  # Valeur initiale (0.5)
+        self.speed_y_slider.setTickInterval(10)
+        self.speed_y_slider.setTickPosition(QSlider.TicksBelow)
+        self.speed_y_slider.valueChanged.connect(self.update_speed_y)
+        
+        self.speed_ang_slider = QSlider(Qt.Horizontal)
+        self.speed_ang_slider.setMinimum(0)
+        self.speed_ang_slider.setMaximum(100)
+        self.speed_ang_slider.setValue(50)  # Valeur initiale (0.5)
+        self.speed_ang_slider.setTickInterval(10)
+        self.speed_ang_slider.setTickPosition(QSlider.TicksBelow)
+        self.speed_ang_slider.valueChanged.connect(self.update_speed_ang)
 
         # Étiquette pour afficher la vitesse actuelle
-        self.speed_label = QLabel("Vitesse : 0.50")
-        self.speed_label.setAlignment(Qt.AlignCenter)
+        self.speed_x_label = QLabel("Vitesse X: 0.30")
+        self.speed_x_label.setAlignment(Qt.AlignCenter)
+        
+        self.speed_y_label = QLabel("Vitesse Y: 0.20")
+        self.speed_y_label.setAlignment(Qt.AlignCenter)
+        
+        self.speed_ang_label = QLabel("Vitesse ang: 0.50")
+        self.speed_ang_label.setAlignment(Qt.AlignCenter)
 
         # Connexion des boutons linéaires aux fonctions
-        btn_forward.pressed.connect(lambda: self.start_movement(1.0, 0.0, 0.0))
-        btn_backward.pressed.connect(lambda: self.start_movement(-1.0, 0.0, 0.0))
-        btn_left.pressed.connect(lambda: self.start_movement(0.0, 1.0, 0.0))
-        btn_right.pressed.connect(lambda: self.start_movement(0.0, -1.0, 0.0))
-        btn_stop.clicked.connect(self.stop_movement)
+        btn_forward.clicked.connect(lambda: self.send_velocity(1.0, 0.0, 0.0))
+        btn_backward.clicked.connect(lambda: self.send_velocity(-1.0, 0.0, 0.0))
+        btn_left.clicked.connect(lambda: self.send_velocity(0.0, 1.0, 0.0))
+        btn_right.clicked.connect(lambda: self.send_velocity(0.0, -1.0, 0.0))
+        btn_stop.clicked.connect(lambda: self.send_velocity(0.0, 0.0, 0.0))
+
+        # Connexion des boutons angulaires aux fonctions
+        btn_rotate_left.clicked.connect(lambda: self.send_velocity(0.0, 0.0, 1.0))
+        btn_rotate_right.clicked.connect(lambda: self.send_velocity(0.0, 0.0, -1.0))
 
         # Ajout des boutons aux layouts
         main_layout.addWidget(btn_forward)
@@ -113,9 +123,17 @@ class RobotController(QWidget):
         main_layout.addLayout(movement_layout)
         main_layout.addWidget(btn_backward)
 
+        angular_layout.addWidget(btn_rotate_left)
+        angular_layout.addWidget(btn_rotate_right)
+        main_layout.addLayout(angular_layout)
+
         # Ajout du slider et de l'étiquette
-        slider_layout.addWidget(self.speed_label)
-        slider_layout.addWidget(self.speed_slider)
+        slider_layout.addWidget(self.speed_x_label)
+        slider_layout.addWidget(self.speed_x_slider)
+        slider_layout.addWidget(self.speed_y_label)
+        slider_layout.addWidget(self.speed_y_slider)
+        slider_layout.addWidget(self.speed_ang_label)
+        slider_layout.addWidget(self.speed_ang_slider)
         main_layout.addLayout(slider_layout)
 
         # Appliquer le layout principal
@@ -129,7 +147,7 @@ if __name__ == "__main__":
         controller.show()
         sys.exit(app.exec_())
     except rospy.ROSInterruptException:
-		mecanum_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+	mecanum_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
         twist = Twist()
         twist.linear.x = 0.0
         twist.linear.y = 0.0
@@ -139,3 +157,15 @@ if __name__ == "__main__":
         twist.angular.z = 0.0
         mecanum_pub.publish(twist)
         pass
+    finally:
+        mecanum_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+        twist = Twist()
+        twist.linear.x = 0.0
+        twist.linear.y = 0.0
+        twist.linear.z = 0.0
+        twist.angular.x = 0.0
+        twist.angular.y = 0.0
+        twist.angular.z = 0.0
+        mecanum_pub.publish(twist)
+		
+

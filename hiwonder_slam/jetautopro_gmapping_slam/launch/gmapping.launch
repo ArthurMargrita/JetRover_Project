@@ -1,0 +1,32 @@
+<launch>
+    <!-- Arguments -->
+    
+
+    <!--topic and frame settings-->
+
+    <arg name="scan"        default="scan_raw"/>
+    <arg name="base_frame"  default="base_footprint"/>
+    <arg name="odom_frame"  default="odom"/>
+    <arg name="map_frame"   default="map"/>
+
+   
+    <!--charger les transformés statiques-->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" >
+        <param name="tf_prefix" value="" />
+    </node>
+
+    <!-- Gmapping -->
+    <node pkg="gmapping" type="slam_gmapping" name="hiwonder_slam_gmapping" output="screen">
+        <param name="base_frame"    value="$(arg base_frame)"/>
+        <param name="odom_frame"    value="$(arg odom_frame)"/>
+        <param name="map_frame"     value="$(arg map_frame)"/>
+        <remap from="/scan"         to="$(arg scan)"/> <!-- Remapping dynamique -->
+        <rosparam command="load"    file="$(find hiwonder_slam)/config/gmapping_params.yaml" />
+    </node>
+
+	<!--lancer la config rviz-->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find jetautopro_gmapping_slam)/launch/rviz_slam.rviz" output="screen"/>
+
+
+</launch>
+
