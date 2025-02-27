@@ -1,0 +1,12 @@
+<launch>
+  <!-- 1. Exporter le paramètre pour la manette -->
+  <param name="joy_node/dev" value="/dev/input/js1" />
+
+  <!-- 2. Lancer le nœud joy_node -->
+  <node name="joy_node" pkg="joy" type="joy_node" />
+
+  <!-- 3. Lancer le script Python -->
+  <node name="joy_command" pkg="joystick" type="joystick_control.py" output="screen" />
+
+</launch>
+
