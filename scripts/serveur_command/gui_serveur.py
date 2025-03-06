@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 
 import sys
 import urllib
@@ -25,76 +25,71 @@ class ControlWindow(QtGui.QMainWindow):
     def __init__(self):
         super(ControlWindow, self).__init__()
         self.thread = None
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
-        self.setWindowTitle('Contrôle du Serveur')
-        self.setGeometry(300, 300, 600, 400)
+    def init_ui(self):
+        self.setWindowTitle('Server Control')
+        self.setGeometry(300, 300, 500, 400)
 
         # Widgets
-        self.start_btn = QtGui.QPushButton('Démarrer le serveur', self)
-        self.stop_btn = QtGui.QPushButton('Arrêter le serveur', self)
-        self.get_list_btn = QtGui.QPushButton('Afficher la liste', self)
-        self.status_label = QtGui.QLabel('Statut : Serveur arrêté')
-        self.log_area = QtGui.QTextEdit()
-        self.log_area.setReadOnly(True)
+        self.start_btn = QtGui.QPushButton('Start Server', self)
+        self.stop_btn = QtGui.QPushButton('Stop Server', self)
+        self.show_list_btn = QtGui.QPushButton('Show List', self)
+        self.log_display = QtGui.QTextEdit()
+        self.log_display.setReadOnly(True)
 
-        # Disposition
+        # Layout
         layout = QtGui.QVBoxLayout()
         layout.addWidget(self.start_btn)
         layout.addWidget(self.stop_btn)
-        layout.addWidget(self.get_list_btn)
-        layout.addWidget(self.status_label)
-        layout.addWidget(QtGui.QLabel("Journal d'événements :"))
-        layout.addWidget(self.log_area)
+        layout.addWidget(self.show_list_btn)
+        layout.addWidget(self.log_display)
 
         central_widget = QtGui.QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
-        # Connexions
+        # Connections
         self.start_btn.clicked.connect(self.start_server)
         self.stop_btn.clicked.connect(self.stop_server)
-        self.get_list_btn.clicked.connect(self.show_order_list)
+        self.show_list_btn.clicked.connect(self.show_order_list)
 
     def start_server(self):
         if not self.thread or not self.thread.isRunning():
             self.thread = ServerThread()
             self.thread.log_signal.connect(self.update_log)
             self.thread.start()
-            self.status_label.setText('Statut : Serveur actif')
-            self.log_area.append("=== Serveur démarré ===")
+            self.update_log("Server started")
 
     def stop_server(self):
         try:
             req = urllib2.Request('http://localhost:5000/shutdown', data=urllib.urlencode({}))
             req.get_method = lambda: 'POST'
             urllib2.urlopen(req, timeout=1)
-            self.status_label.setText('Statut : Serveur arrêté')
+            self.update_log("Server stopped")
         except Exception as e:
-            self.log_area.append("Erreur d'arrêt : {str()}".format(e))
-            QtGui.QMessageBox.warning(self, 'Erreur', str(e))
+            self.update_log("Shutdown error: {}".format(str(e)))
 
     def show_order_list(self):
         if self.thread and self.thread.server:
             orders = self.thread.server.order_list
-            msg = "Éléments dans la liste : {}\n{}".format(len(orders),orders)
-            QtGui.QMessageBox.information(self, 'Liste des commandes', msg)
+            self.update_log("Current list: {}".format(orders))
         else:
-            QtGui.QMessageBox.warning(self, 'Erreur', 'Serveur non démarré')
+            self.update_log("No active server")
 
     def update_log(self, message):
-        self.log_area.append(message)
-        # Défilement automatique vers le bas
-        scrollbar = self.log_area.verticalScrollBar()
-        scrollbar.setValue(scrollbar.maximum())
-
-    def closeEvent(self, event):
-        if self.thread and self.thread.isRunning():
-            self.stop_server()
-            self.thread.quit()
-            self.thread.wait(2000)
-        event.accept()
+        # Convert to Unicode and handle encoding
+        try:
+            safe_msg = unicode(message, 'utf-8')
+        except TypeError:
+            safe_msg = unicode(message)
+        
+        # Format with Unicode objects
+        timestamp = unicode(QtCore.QTime.currentTime().toString())
+        log_entry = u"[{}] {}".format(timestamp, safe_msg)
+        
+        # Append to QTextEdit
+        self.log_display.append(log_entry)
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
