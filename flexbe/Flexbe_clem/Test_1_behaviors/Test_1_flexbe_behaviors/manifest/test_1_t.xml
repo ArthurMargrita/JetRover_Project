@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Test_1_T">
+
+	<executable package_path="Test_1_flexbe_behaviors.test_1_t_sm" class="Test_1_TSM" />
+	<tagstring></tagstring>
+	<author>Clem</author>
+	<date>Wed Mar 05 2025</date>
+	<description>
+		Test numéro 1 de la tournée de routine du robot
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

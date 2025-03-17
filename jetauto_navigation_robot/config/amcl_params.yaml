@@ -1,0 +1,12 @@
+min_particles: 500  # Augmenter le nombre de particules pour une meilleure estimation
+max_particles: 5000  # Empêche AMCL d'exploser en consommation mémoire
+kld_err: 0.01  # Améliore la convergence du filtre de particules
+update_min_d: 0.1  # AMCL mettra à jour la localisation tous les 10 cm
+update_min_a: 0.1  # AMCL mettra à jour la localisation tous les 0.1 rad (~5.7°)
+laser_max_range: 10.0  # Met une limite au scan pour éviter les erreurs dues à des réflexions lointaines
+
+# Initialisation de la position AMCL
+initial_pose_x: 3.0
+initial_pose_y: 0.5
+initial_pose_a: 3.14  # Orientation en radians
+

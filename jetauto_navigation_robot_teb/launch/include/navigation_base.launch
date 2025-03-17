@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="drive_type"  default="diff"/>
+
+
+    <arg name="cmd_vel_topic"       default="/cmd_vel"/>
+    <arg name="scan_topic"          default="/scan"/>
+    <arg name="map_topic" 	    default="/map"/>
+    <arg name="odom_topic"          default="/odom"/>
+
+    <arg name="map_frame" default="map"/>
+    <arg name="odom_frame"          default="odom"/>
+    <arg name="base_frame"          default="base_footprint"/>
+    <arg name="use_teb"             default="true"/>
+    <arg name="clicked_point"       default="/clicked_point"/>
+    <arg name="move_base_result"    default="/move_base/result"/>
+
+
+
+
+	<!-- 启动路径规划算法包 -->
+	<include file="$(find jetauto_navigation_robot)/launch/include/move_base.launch">
+	    <arg name="drive_type"                      value="$(arg drive_type)"/>
+	    <arg name="cmd_vel_topic"                   value="$(arg cmd_vel_topic)"/>
+
+	    <arg name="global_costmap_map_topic"        value="$(arg map_topic)"/>
+	    <arg name="global_costmap_sensor_frame"     value="$(arg base_frame)"/>
+	    <arg name="global_costmap_sensor_topic"     value="$(arg scan_topic)"/>
+	    <arg name="global_costmap_global_frame"     value="$(arg map_frame)"/>
+	    <arg name="global_costmap_robot_base_frame" value="$(arg base_frame)"/>
+	    <arg name="local_costmap_map_topic"         value="$(arg map_topic)"/>
+	    <arg name="local_costmap_sensor_frame"      value="$(arg base_frame)"/>
+	    <arg name="local_costmap_sensor_topic"      value="$(arg scan_topic)"/>
+	    <arg name="local_costmap_global_frame"      value="$(arg odom_frame)"/>
+	    <arg name="local_costmap_robot_base_frame"  value="$(arg base_frame)"/>
+	    <arg name="virtual_wall_map_frame"          value="$(arg map_frame)"/>
+	    <arg name="dwa_global_frame"                value="$(arg map_frame)"/>
+	    <arg name="teb_odom_topic"                  value="$(arg odom_topic)"/>
+	    <arg name="teb_map_frame"                   value="$(arg odom_frame)"/>
+	</include>
+
+</launch>

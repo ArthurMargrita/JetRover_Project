@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<launch>
+    <!--paramètres de lancement -->
+    <!-- le dossier contenant les maps se trouvent dans ros_ws/src/map, configurable dans le fichier load_map.launch-->
+    <arg name="map"         default="map_sim03_up"/> 
+
+    <!-- charger les transformées -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" >
+        <param name="tf_prefix" value="" />
+    </node>
+
+
+    <!-- charger la map -->
+    <include file="$(find jetauto_navigation_simulation)/launch/include/load_map.launch">
+        <arg name="map"         value="$(arg map)"/>
+    </include>
+
+
+    <!-- Lancer AMCL--> 
+	<node name="amcl" pkg="amcl" type="amcl" output="screen">
+		<remap from="/scan" to="/scan_raw"/>
+	
+	</node>
+
+    <!-- démarrer le packet move_base -->
+        <include file="$(find jetauto_navigation_simulation)/launch/include/move_base.launch">
+            <arg name="drive_type"                      value="omni"/>
+            <arg name="use_teb"                         value="false"/> <!-- Active l'algorithme TEB pour la planification de trajectoire dynamique, optimisée en temps réel. -->
+            <arg name="cmd_vel_topic"                   value="/cmd_vel"/>
+
+            <arg name="global_costmap_map_topic"        value="map"/>
+            <arg name="global_costmap_sensor_frame"     value="base_footprint"/>
+            <arg name="global_costmap_sensor_topic"     value="scan_raw"/>
+            <arg name="global_costmap_global_frame"     value="map"/>
+            <arg name="global_costmap_robot_base_frame" value="base_footprint"/>
+            <arg name="local_costmap_map_topic"         value="map"/>
+            <arg name="local_costmap_sensor_frame"      value="base_footprint"/>
+            <arg name="local_costmap_sensor_topic"      value="scan_raw"/>
+            <arg name="local_costmap_global_frame"      value="odom"/>
+            <arg name="local_costmap_robot_base_frame"  value="base_footprint"/>
+            <arg name="virtual_wall_map_frame"          value="map"/>
+            <arg name="dwa_global_frame"                value="map"/>
+            <arg name="teb_odom_topic"                  value="odom"/>
+            <arg name="teb_map_frame"                   value="odom"/>
+        </include>
+
+
+
+</launch>

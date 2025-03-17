@@ -1,0 +1,13 @@
+GlobalPlanner:                # Voir aussi : http://wiki.ros.org/global_planner
+  old_navfn_behavior: false   # Si vrai, le planner reproduit exactement le comportement de navfn.
+  use_quadratic: true         # Si vrai, utilise une approximation quadratique du potentiel. Sinon, utilise un calcul plus simple.
+  use_dijkstra: true          # Si vrai, utilise l'algorithme de Dijkstra. Sinon, utilise A* (en activant use_grid_path).
+  use_grid_path: false        # Si vrai, génère un chemin qui suit les contours de la grille. Sinon, utilise la descente de gradient.
+
+  allow_unknown: false         # Autorise le planner à traverser des zones inconnues. Si vous utilisez une costmap avec une couche voxel ou obstacle, activez track_unknown_space pour que les zones inconnues ne soient pas considérées comme accessibles.
+
+  planner_window_x: 0.0       # Par défaut 0.0
+  planner_window_y: 0.0       # Par défaut 0.0
+  default_tolerance: 0.0      # Tolérance autour du point cible. Le planner essaiera de générer un chemin aussi proche que possible du but sans dépasser cette tolérance.
+
+  visualize_potential: false  # Active la visualisation du potentiel calculé via PointCloud2.

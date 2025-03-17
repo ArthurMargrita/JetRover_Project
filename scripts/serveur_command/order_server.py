@@ -56,7 +56,7 @@ class OrderServer:
 		return 'Data received successfully', 200
 
 	def shutdown(self):
-		#self.log("Arrêt du serveur initié")
+		self.log("Arrêt du serveur initié")
 		func = request.environ.get('werkzeug.server.shutdown')
 		if func is None:
 			raise RuntimeError('Not running with the Werkzeug Server')
