@@ -7,31 +7,32 @@ from move_base_msgs.msg import MoveBaseActionGoal
 from actionlib_msgs.msg import GoalID
 from geometry_msgs.msg import PoseWithCovarianceStamped, Quaternion
 from std_srvs.srv import Empty
-from geometry_msgs.msg import PoseStamped
-
-import math
 from PyQt5.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QVBoxLayout,
-    QLineEdit,
-    QLabel,
-    QPushButton,
-    QWidget,
-    QHBoxLayout,
-    QFormLayout,
+    QApplication, QMainWindow, QVBoxLayout, QLineEdit, QLabel,
+    QPushButton, QWidget, QHBoxLayout, QFormLayout
 )
+import math
 
-def euler_to_quaternion(yaw_degrees):
+def quaternion_to_euler(q):
     """
-    Convertit une rotation autour de l'axe Z (yaw) en quaternion.
+    Convertit un quaternion en un angle de rotation autour de l'axe Z (yaw en degrés).
     """
-    yaw = math.radians(yaw_degrees)
-    qx = 0.0
-    qy = 0.0
-    qz = math.sin(yaw / 2.0)
-    qw = math.cos(yaw / 2.0)
-    return Quaternion(x=qx, y=qy, z=qz, w=qw)
+    siny_cosp = 2 * (q.w * q.z + q.x * q.y)
+    cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+    yaw = math.atan2(siny_cosp, cosy_cosp)
+    return math.degrees(yaw)
+
+def euler_to_quaternion(yaw):
+    """
+    Convertit un angle de rotation autour de l'axe Z (yaw en degrés) en quaternion.
+    """
+    yaw = math.radians(yaw)  # Convertir en radians
+    q = Quaternion()
+    q.w = math.cos(yaw / 2)
+    q.x = 0.0
+    q.y = 0.0
+    q.z = math.sin(yaw / 2)
+    return q
 
 class GoalPublisherApp(QMainWindow):
     def __init__(self):
@@ -40,9 +41,6 @@ class GoalPublisherApp(QMainWindow):
         # Initialisation du publisher ROS
         rospy.init_node("goal_publisher_gui", anonymous=True)
         self.publisher = rospy.Publisher("/move_base/goal", MoveBaseActionGoal, queue_size=1, latch=True)
-
-
-        # Initialisation du subscriber pour le topic /amcl_pose
         self.pose_subscriber = rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, self.pose_callback)
 
         # Configuration de l'interface utilisateur
@@ -51,8 +49,6 @@ class GoalPublisherApp(QMainWindow):
 
         # Layout principal
         main_layout = QVBoxLayout()
-
-        # Champs pour la position et la rotation
         form_layout = QFormLayout()
 
         self.x_input = QLineEdit()
@@ -78,16 +74,16 @@ class GoalPublisherApp(QMainWindow):
         self.stop_button = QPushButton("Stop")
         self.stop_button.clicked.connect(self.stop)
 
-        self.reset_button = QPushButton("Réinitialiser AMCL")  # Bouton pour reset AMCL
+        self.reset_button = QPushButton("Réinitialiser AMCL")
         self.reset_button.clicked.connect(self.reset_amcl)
 
-        self.check_position_button = QPushButton("Check Position")  # Nouveau bouton
-        self.check_position_button.clicked.connect(self.check_position)  # Connexion du bouton
+        self.check_position_button = QPushButton("Check Position")
+        self.check_position_button.clicked.connect(self.check_position)
 
         button_layout.addWidget(self.publish_button)
         button_layout.addWidget(self.stop_button)
         button_layout.addWidget(self.reset_button)
-        button_layout.addWidget(self.check_position_button)  # Ajouter le bouton à l'interface
+        button_layout.addWidget(self.check_position_button)
 
         main_layout.addLayout(button_layout)
 
@@ -99,6 +95,7 @@ class GoalPublisherApp(QMainWindow):
         # Variables pour stocker les données
         self.goal_position = None
         self.robot_position = None
+        self.robot_yaw = None
 
     def publish_goal(self):
         """
@@ -131,6 +128,7 @@ class GoalPublisherApp(QMainWindow):
 
     def pose_callback(self, msg):
         self.robot_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
+        self.robot_yaw = quaternion_to_euler(msg.pose.pose.orientation)
 
     def stop(self):
         rospy.loginfo("Annulation du goal en cours...")
@@ -181,7 +179,8 @@ class GoalPublisherApp(QMainWindow):
         Affiche la position actuelle du robot avec AMCL.
         """
         if self.robot_position:
-            self.robot_position_label.setText("Position actuelle : X={:.2f}, Y={:.2f}".format(self.robot_position[0], self.robot_position[1]))
+            self.robot_position_label.setText("Position actuelle : X={:.2f}, Y={:.2f}, Yaw (deg)={:.2f}".format(
+                self.robot_position[0], self.robot_position[1], self.robot_yaw))
         else:
             self.robot_position_label.setText("Position actuelle : Inconnue")
 
@@ -193,3 +192,4 @@ if __name__ == "__main__":
         sys.exit(app.exec_())
     except rospy.ROSInterruptException:
         QApplication.instance().quit()
+

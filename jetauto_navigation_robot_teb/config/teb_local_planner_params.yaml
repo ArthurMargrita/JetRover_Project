@@ -15,13 +15,13 @@ TebLocalPlannerROS:
   publish_feedback: true
 
   # Robot 机器人配置参数(Robot configuration parameter)
-  max_vel_x: 0.2  # 0.15 X方向最大速度(maximum velocity in X direction)
-  max_vel_y: 0.0  #16.25   # 差速轮机器人无Y方向速度，取0 (Maximum strafing velocity of the robot. Should be zero for differential wheel robots!)#########################################################
-  max_vel_x_backwards: 0.2 # 0.15 向后行驶时机器人的最大绝对平移速度（以米/秒为单位）(Maximum absolute translational velocity of the robot while driving backwards in meters/sec)
-  max_vel_theta: 0.3  # 0.3 允许的最大旋转速度，单位为弧度/秒(Maximum rotation velocity in rad/s)
-  acc_lim_x: 0.2  # X方向最大线加速度(maximum linear acceleration in x direction)
-  acc_lim_y: 0.0 # 差速轮机器人无Y方向线加速度，取0 (Maximum strafing acceleration of the robot. Should be zero for Differential wheel robots!)#####################################################
-  acc_lim_theta: 0.3 # 0.15 最大角加速度(maximum angular acceleration)
+  max_vel_x: 0.15  # 0.15 X方向最大速度(maximum velocity in X direction)
+  max_vel_y: 0.15  #16.25   # 差速轮机器人无Y方向速度，取0 (Maximum strafing velocity of the robot. Should be zero for differential wheel robots!)#########################################################
+  max_vel_x_backwards: 0.15 # 0.15 向后行驶时机器人的最大绝对平移速度（以米/秒为单位）(Maximum absolute translational velocity of the robot while driving backwards in meters/sec)
+  max_vel_theta: 0.15  # 0.3 允许的最大旋转速度，单位为弧度/秒(Maximum rotation velocity in rad/s)
+  acc_lim_x: 0.15  # X方向最大线加速度(maximum linear acceleration in x direction)
+  acc_lim_y: 0.15 # 差速轮机器人无Y方向线加速度，取0 (Maximum strafing acceleration of the robot. Should be zero for Differential wheel robots!)#####################################################
+  acc_lim_theta: 0.15 # 0.15 最大角加速度(maximum angular acceleration)
   min_turning_radius: 0 # 类车机器人的最小转弯半径（差速驱动机器人设置为零(Minimum turning radius of a carlike robot (set to zero for a diff-drive robot))
   # 指定用于优化的机器人足迹模型类型。不同的类型是“点”、“圆形”、“线”、“two_circles”和“多边形”。模型的类型显着影响所需的计算时间(specify the type of robot trajectory model used for optimization, inluding "point", "circle", "line", "two_circles" and "polygon". The model type has great influence on the time spent on calculation)
   #footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
@@ -30,8 +30,8 @@ TebLocalPlannerROS:
     #vertices: [[-0.17, -0.14], [-0.17, 0.14],[0.17, 0.14], [0.17, -0.14]]
 
   # GoalTolerance 目标容差参数(goal tolerance parameter)
-  xy_goal_tolerance: 0.1 # 到目标位置的允许最终欧几里德距离（以米为单位(Allowed final euclidean distance to the goal position in meters)
-  yaw_goal_tolerance: 0.2 # 允许的最终方向误差（以弧度为单位）(Allowed final orientation error in radians)
+  xy_goal_tolerance: 0.01 # 到目标位置的允许最终欧几里德距离（以米为单位(Allowed final euclidean distance to the goal position in meters)
+  yaw_goal_tolerance: 0.01 # 允许的最终方向误差（以弧度为单位）(Allowed final orientation error in radians)
   free_goal_vel: false # 去除目标速度约束，使机器人能够以最大速度到达目标(Remove the goal velocity constraint such that the robot can arrive at the goal with maximum speed)
 
   # Obstacles 障碍物参数(obstacle parameters)
@@ -52,12 +52,12 @@ TebLocalPlannerROS:
   optimization_verbose: False
   penalty_epsilon: 0.05 # 为硬约束近似的惩罚函数添加一个小的安全余量(Add a small safety margin to penalty functions for hard-constraint approximations)
   weight_max_vel_x: 1 # 满足最大允许平移速度的优化权重(Optimization weight for satisfying the maximum allowed translational velocity)
-  weight_max_vel_y: 0 #1                #差速导航注释掉此行(comment this line of code for differential navigation) ################################################
+  weight_max_vel_y: 1 #1                #差速导航注释掉此行(comment this line of code for differential navigation) ################################################
   weight_max_vel_theta: 1
   weight_acc_lim_x: 1
-  weight_acc_lim_y: 0 #1                #差速导航注释掉此行(comment this line of code for differential navigation) ################################################
+  weight_acc_lim_y: 1 #1                #差速导航注释掉此行(comment this line of code for differential navigation) ################################################
   weight_acc_lim_theta: 1
-  weight_kinematics_nh: 800  # 满足非完整运动学的优化权重（此参数必须很高，因为运动学方程构成等式约束，即使值 1000 也不意味着由于与其他成本相比较小的“原始”成本值而导致矩阵条件不佳）(Optimization weight for satisfying the non-holonomic kinematics (this parameter must be high since the kinematics equation constitutes an equality constraint, even a value of 1000 does not imply a bad matrix condition due to small 'raw' cost values in comparison to other costs).)
+  weight_kinematics_nh: 1000  # 满足非完整运动学的优化权重（此参数必须很高，因为运动学方程构成等式约束，即使值 1000 也不意味着由于与其他成本相比较小的“原始”成本值而导致矩阵条件不佳）(Optimization weight for satisfying the non-holonomic kinematics (this parameter must be high since the kinematics equation constitutes an equality constraint, even a value of 1000 does not imply a bad matrix condition due to small 'raw' cost values in comparison to other costs).)
   weight_kinematics_forward_drive: 500 # 强制机器人仅选择前向（正平移速度）的优化权重。较小的重量（例如 1.0）仍然允许向后行驶。1000 左右的值几乎可以防止向后行驶（但不能保证）。(Optimization weight for forcing the robot to choose only forward directions (positive transl. velocities). A small weight (e.g. 1.0) still allows driving backwards. A value around 1000 almost prevents backward driving (but cannot be guaranteed))
   weight_kinematics_turning_radius: 1 # 执行最小转弯半径的优化权重（仅适用于类车机器人）。(Optimization weight for enforcing a minimum turning radius (only for carlike robots).)
   weight_optimaltime: 1 # 用于收缩轨迹 wrt 转换/执行时间的优化权重(Optimization weight for contracting the trajectory wrt transition/execution time)

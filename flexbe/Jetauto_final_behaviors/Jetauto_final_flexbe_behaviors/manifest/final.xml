@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Final">
+
+	<executable package_path="Jetauto_final_flexbe_behaviors.final_sm" class="FinalSM" />
+	<tagstring></tagstring>
+	<author>arthur</author>
+	<date>Thu Mar 20 2025</date>
+	<description>
+		final
+	</description>
+
+
+	<!-- Contained Behaviors -->
+	<contains name="Final_tournee" />
+	<contains name="Final_command" />
+
+	<!-- Available Parameters -->
+
+</behavior>

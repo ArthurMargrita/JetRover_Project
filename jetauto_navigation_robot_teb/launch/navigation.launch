@@ -43,11 +43,11 @@
 	</node>
 
 
-	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find jetauto_navigation_robot)/rviz/navigation.rviz"/>
+	<node pkg="rviz" type="rviz" name="rviz" args="-d $(find jetauto_navigation_robot_teb)/rviz/navigation.rviz"/>
 
-    	<node pkg="jetauto_navigation_robot" type="gui_cmdvel_control3.py" name="gui_cmdvel_control3" output="screen" args="$(find jetauto_navigation_robot)/scripts/gui_cmdvel_control3.py" />
+    	<node pkg="jetauto_navigation_robot_teb" type="gui_serveur.py" name="gui_serveur" output="screen" args="$(find jetauto_navigation_robot_teb)/scripts/gui_serveur.py" />
 
-	<node pkg="jetauto_navigation_robot" type="gui_goal_publisher.py" name="gui_goal_publisher" output="screen" args="$(find jetauto_navigation_robot)/scripts/gui_goal_publisher.py" />
+	<node pkg="jetauto_navigation_robot_teb" type="gui_goal_publisher.py" name="gui_goal_publisher" output="screen" args="$(find jetauto_navigation_robot_teb)/scripts/gui_goal_publisher.py" />
 
 
 
